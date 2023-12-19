@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: vproapp-deployment
+    labels:
+        app: vproapp
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: vproapp
+    template:
+        metadata:
+            labels:
+                app: vproapp
+        spec:
+            containers:
+              - name: vproapp
+                image: visualpath/vpromultiapp
+                resources:
+                    limits:
+                        cpu: "1"
+                    requests:
+                        cpu: 200m
+                ports:
+                  - containerPort: 8080
+                    name: vproapp-port
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: vproapp-service
+spec:
+    selector:
+        app: vproapp
+    ports:
+      - port: 80
+        targetPort: vproapp-port
+        protocol: TCP
+    type: LoadBalancer
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+    name: hpa-vprofile-autoscaler
+spec:
+    scaleTargetRef:
+        apiVersion: extensions/v1beta1
+        kind: Deployment
+        name: vproapp
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 50

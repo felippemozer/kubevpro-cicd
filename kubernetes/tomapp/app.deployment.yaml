@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: vproapp
+    labels:
+        app: vproapp
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: vproapp
+    template:
+        metadata:
+            labels:
+                app: vproapp
+        spec:
+            containers:
+              - name: vproapp
+                image: imranvisualpath/8amtomapp_1
+                resources:
+                    limits:
+                        memory: "128Mi"
+                        cpu: "500m"
+                ports:
+                  - containerPort: 8080
+                    name: vproapp-port
